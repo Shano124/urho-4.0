@@ -1,4 +1,4 @@
-# Copyright (c) 2008-2023 the Urho3D project
+# Copyright (c) 2008-2026 the Urho 4.0 project
 # License: MIT
 
 # Set CMake minimum version
@@ -23,7 +23,7 @@ foreach (CACHE_VAR ${CACHE_VARS})
 endforeach ()
 message ("!! CMAKE_ARGS: ${CMAKE_ARGS}")
 
-# Включаем поддержку папок в IDE
+# Enable folder support in IDE
 set_property (GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Set CMake modules search path
@@ -68,7 +68,7 @@ install (PROGRAMS ${CMAKE_SCRIPTS} DESTINATION ${DEST_SHARE_DIR}/scripts)
 install (FILES rakefile DESTINATION ${DEST_SHARE_DIR})
 
 # Setup package variables
-set (URHO3D_DESCRIPTION "Urho3D is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. Greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D (http://www.horde3d.org).")
+set (URHO3D_DESCRIPTION "Urho 4.0 is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. Greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D (http://www.horde3d.org).")
 set (CPACK_PACKAGE_DESCRIPTION_SUMMARY ${URHO3D_DESCRIPTION})
 set (URHO3D_URL "https://github.com/urho3d/Urho3D")
 set (CPACK_PACKAGE_VENDOR ${URHO3D_URL})
@@ -173,16 +173,16 @@ if (URHO3D_MACOSX_BUNDLE OR (APPLE AND ARM))
         set (MACOSX_BUNDLE_SHORT_VERSION_STRING ${URHO3D_VERSION})
     endif ()
     if (NOT MACOSX_BUNDLE_COPYRIGHT)
-        set (MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2008-2023 the Urho3D project.")
+        set (MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2008-2026 the Urho 4.0 project.")
     endif ()
 endif ()
 
-# Setup SDK-like include dir in the build tree for building the Urho3D library
+# Setup SDK-like include dir in the build tree for building the Urho 4.0 library
 set (THIRD_PARTY_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
 file (MAKE_DIRECTORY ${THIRD_PARTY_INCLUDE_DIR})
 
-# Urho3D source
+# Urho 4.0 source
 add_subdirectory (Source)
 
-# Urho3D documentation
+# Urho 4.0 documentation
 add_subdirectory (Docs)
