@@ -17,11 +17,11 @@
    version="1.1"
    inkscape:version="0.91 r13725"
    sodipodi:docname="UI.svg"
-   inkscape:export-filename="/home/frode/Git/Urho3D/bin/Data/Textures/UI.png"
+   inkscape:export-filename="/home/frode/Git/Urho-4.0/bin/Data/Textures/UI.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <title
-     id="title5629">Urho3D GUI</title>
+     id="title5629">Urho 4.0 GUI</title>
   <sodipodi:namedview
      id="base"
      pagecolor="#a5a5a5"
@@ -1270,7 +1270,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title>Urho3D GUI</dc:title>
+        <dc:title>Urho 4.0 GUI</dc:title>
         <dc:creator>
           <cc:Agent>
             <dc:title>Frode 'Modanung' Lindeijer</dc:title>
@@ -1284,7 +1284,7 @@
         <dc:date>April 1st 2018</dc:date>
         <dc:publisher>
           <cc:Agent>
-            <dc:title>Urho3D</dc:title>
+            <dc:title>Urho 4.0</dc:title>
           </cc:Agent>
         </dc:publisher>
         <cc:license
