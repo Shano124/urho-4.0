@@ -24,10 +24,10 @@ plugins {
 val kotlinVersion: String by ext
 
 allprojects {
-    group = "io.urho3d"
+    group = "io.urho4"
     version = determineVersion()
     description = """
-        Urho3D is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and
+        Urho 4.0 is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and
         released under the MIT license. Greatly inspired by OGRE and Horde3D.
     """.trimIndent().replace('\n', ' ')
     repositories {

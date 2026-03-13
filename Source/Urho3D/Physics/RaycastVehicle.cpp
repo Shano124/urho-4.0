@@ -1,4 +1,5 @@
-// Copyright (c) 2008-2023 the Urho3D project
+// Copyright (c) 2008-2026 the Urho 4.0 project
+// Copyright (c) 2026 Nitro Boost System extension by Shano
 // License: MIT
 
 #include "../Core/Context.h"
@@ -128,6 +129,17 @@ RaycastVehicle::RaycastVehicle(Context* context) :
     activate_ = false;
     inAirRPM_ = 0.0f;
     maxSideSlipSpeed_ = 4.0f;
+
+    // Initialize nitro boost system
+    nitroActive_ = false;
+    nitroTimer_ = 0.0f;
+    nitroCooldownTimer_ = 0.0f;
+    nitroDuration_ = 3.0f;              // 3 second boost duration
+    nitroCooldown_ = 5.0f;              // 5 second cooldown
+    nitroMultiplier_ = 2.5f;            // 2.5x engine power
+    nitroStartupTime_ = 0.3f;           // 300ms ramp-up time
+    nitroPowerCurve_ = 0.0f;
+    nitroStartTime_ = 0.0f;
 }
 
 RaycastVehicle::~RaycastVehicle()
@@ -269,6 +281,9 @@ void RaycastVehicle::Init()
 
 void RaycastVehicle::FixedUpdate(float timeStep)
 {
+    // Update nitro boost system state
+    UpdateNitroState(timeStep);
+
     btRaycastVehicle* vehicle = vehicleData_->Get();
     for (int i = 0; i < GetNumWheels(); i++)
     {
@@ -750,6 +765,125 @@ void RaycastVehicle::SetWheelDataAttr(const VariantVector& value)
     }
 
     loadedWheelData_ = value;
+}
+
+// ============================== NITRO BOOST SYSTEM IMPLEMENTATION ==============================
+
+bool RaycastVehicle::SetNitroActive(bool active)
+{
+    if (active && !nitroActive_)
+    {
+        // User requesting to activate nitro
+        if (nitroCooldownTimer_ <= 0.0f)
+        {
+            // Cooldown has expired, nitro is available - activate it
+            nitroActive_ = true;
+            nitroTimer_ = nitroDuration_;
+            nitroPowerCurve_ = 0.0f;  // Start curve at 0, will interpolate up
+            nitroCooldownTimer_ = 0.0f;
+            nitroStartTime_ = GetSubsystem<Time>()->GetElapsedTime();
+            
+            URHO3D_LOGDEBUG("Nitro boost ACTIVATED: duration=" + String(nitroDuration_) +
+                          "s, multiplier=" + String(nitroMultiplier_) + "x");
+            return true;
+        }
+        else
+        {
+            // Cooldown still active, cannot activate
+            URHO3D_LOGDEBUG("Nitro still on cooldown: " + String(nitroCooldownTimer_) + "s remaining");
+            return false;
+        }
+    }
+    else if (!active && nitroActive_)
+    {
+        // User requesting to deactivate nitro (early termination)
+        nitroActive_ = false;
+        nitroPowerCurve_ = 0.0f;
+        nitroCooldownTimer_ = nitroCooldown_;  // Start cooldown period
+        
+        URHO3D_LOGDEBUG("Nitro boost DEACTIVATED (manual). Cooldown starts: " + String(nitroCooldown_) + "s");
+        return true;
+    }
+    
+    // No state change needed
+    return false;
+}
+
+void RaycastVehicle::UpdateNitroState(float timeStep)
+{
+    if (nitroActive_)
+    {
+        // Decrease remaining boost time
+        nitroTimer_ -= timeStep;
+        
+        if (nitroTimer_ <= 0.0f)
+        {
+            // Boost duration expired, deactivate
+            nitroTimer_ = 0.0f;
+            nitroActive_ = false;
+            nitroCooldownTimer_ = nitroCooldown_;  // Start cooldown
+            nitroPowerCurve_ = 0.0f;
+            
+            URHO3D_LOGDEBUG("Nitro boost EXPIRED. Cooldown started: " + String(nitroCooldown_) + "s");
+        }
+        else
+        {
+            // Still boosting - update power curve for smooth ramp-up
+            float elapsedInBoost = nitroDuration_ - nitroTimer_;
+            
+            if (elapsedInBoost < nitroStartupTime_)
+            {
+                // Still ramping up to full power
+                nitroPowerCurve_ = elapsedInBoost / nitroStartupTime_;
+            }
+            else
+            {
+                // At full power
+                nitroPowerCurve_ = 1.0f;
+            }
+        }
+    }
+    else if (nitroCooldownTimer_ > 0.0f)
+    {
+        // Boost is inactive, decrease cooldown
+        nitroCooldownTimer_ -= timeStep;
+        
+        if (nitroCooldownTimer_ <= 0.0f)
+        {
+            nitroCooldownTimer_ = 0.0f;
+            URHO3D_LOGDEBUG("Nitro boost AVAILABLE: Cooldown ended");
+        }
+    }
+}
+
+float RaycastVehicle::GetNitroEngineForceFactor() const
+{
+    if (!nitroActive_)
+        return 1.0f;
+    
+    // Interpolate between 1.0 (no boost) and nitroMultiplier_ (full boost)
+    // nitroPowerCurve_ ranges from 0.0 to 1.0
+    return 1.0f + (nitroMultiplier_ - 1.0f) * nitroPowerCurve_;
+}
+
+float RaycastVehicle::GetNitroNextAvailableTime() const
+{
+    if (nitroCooldownTimer_ <= 0.0f)
+        return 0.0f;  // Available now
+    
+    // Return the world time when it will become available
+    return GetSubsystem<Time>()->GetElapsedTime() + nitroCooldownTimer_;
+}
+
+void RaycastVehicle::ResetNitroSystem()
+{
+    nitroActive_ = false;
+    nitroTimer_ = 0.0f;
+    nitroCooldownTimer_ = 0.0f;
+    nitroPowerCurve_ = 0.0f;
+    nitroStartTime_ = 0.0f;
+    
+    URHO3D_LOGDEBUG("Nitro boost system RESET to initial state");
 }
 
 } // namespace Urho3D

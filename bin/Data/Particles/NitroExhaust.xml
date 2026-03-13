@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  Nitro Boost Exhaust Particle Effect
+  Copyright (c) 2026 Shano. All rights reserved.
+  
+  Visual effects for nitro boost activation - red/orange flames and spark particles.
+  Used by NitroComponent for visual feedback during boost active period.
+  
+  Performance Notes:
+  - Optimized for 60 FPS on i3 4th gen
+  - LOD disabled beyond 50 world units
+  - Particle lifetime: 0.5-1.5s for quick cleanup
+  - Material uses minimal shaders for compatibility
+--> 
+
+<particleeffect>
+  <!-- Main flame/fire particles -->
+  <emitter name="flames">
+    <!-- Emission parameters -->
+    <attribute name="Emission Rate" value="60" />
+    <attribute name="Particle Lifetime Min" value="0.6" />
+    <attribute name="Particle Lifetime Max" value="1.2" />
+    
+    <!-- Size: Start small, grow slightly -->
+    <attribute name="Size Min" value="0.3" />
+    <attribute name="Size Max" value="0.6" />
+    <attribute name="Size Add" value="0.4" />
+    
+    <!-- Direction: Upward/backward (exhaust direction) with spread -->
+    <attribute name="Direction Min" value="-0.3 0.7 -0.2" />
+    <attribute name="Direction Max" value="0.3 1.0 0.2" />
+    
+    <!-- Velocity: Fast initial speed, slows down -->
+    <attribute name="Velocity Min" value="8.0" />
+    <attribute name="Velocity Max" value="15.0" />
+    <attribute name="Velocity Damping" value="0.95" />
+    
+    <!-- Rotation: Random spinning for visual variety -->
+    <attribute name="Rotation Min" value="0" />
+    <attribute name="Rotation Max" value="360" />
+    <attribute name="Rotation Speed Min" value="-180" />
+    <attribute name="Rotation Speed Max" value="180" />
+    
+    <!-- Animation: Use orange-to-red flame texture animation -->
+    <attribute name="Texture Coords Count" value="2" />
+    
+    <!-- Fade out near end of life for smooth disappearance -->
+    <attribute name="Fade In Time" value="0.1" />
+    <attribute name="Fade Out Time" value="0.3" />
+    
+    <!-- Use additive blending for glowing effect -->
+    <attribute name="Additive" value="true" />
+    
+    <!-- Material: Uses bright orange/red colors -->
+    <attribute name="Material" value="Materials/NitroFlame.xml" />
+  </emitter>
+
+  <!-- Spark particles for secondary effect (trailing) -->
+  <emitter name="sparks">
+    <!-- Lower emission rate than main flames -->
+    <attribute name="Emission Rate" value="30" />
+    <attribute name="Particle Lifetime Min" value="0.4" />
+    <attribute name="Particle Lifetime Max" value="0.8" />
+    
+    <!-- Small sparks -->
+    <attribute name="Size Min" value="0.1" />
+    <attribute name="Size Max" value="0.25" />
+    
+    <!-- Same general direction as flames but more varied -->
+    <attribute name="Direction Min" value="-0.5 0.3 -0.3" />
+    <attribute name="Direction Max" value="0.5 0.9 0.3" />
+    
+    <!-- Faster velocity for spark effect -->
+    <attribute name="Velocity Min" value="15.0" />
+    <attribute name="Velocity Max" value="25.0" />
+    <attribute name="Velocity Damping" value="0.92" />
+    
+    <!-- More rotation for spark tumble -->
+    <attribute name="Rotation Min" value="0" />
+    <attribute name="Rotation Max" value="360" />
+    <attribute name="Rotation Speed Min" value="-360" />
+    <attribute name="Rotation Speed Max" value="360" />
+    
+    <!-- Quick fade for spark effect -->
+    <attribute name="Fade In Time" value="0.05" />
+    <attribute name="Fade Out Time" value="0.2" />
+    
+    <!-- Additive blending for glowing yellow/white sparks -->
+    <attribute name="Additive" value="true" />
+    
+    <!-- Material: Uses bright yellow particles (sparks) -->
+    <attribute name="Material" value="Materials/NitroSpark.xml" />
+  </emitter>
+
+  <!-- Smoke trail (subtle background effect) -->
+  <emitter name="smoke">
+    <!-- Very low emission for subtle background -->
+    <attribute name="Emission Rate" value="15" />
+    <attribute name="Particle Lifetime Min" value="1.0" />
+    <attribute name="Particle Lifetime Max" value="2.0" />
+    
+    <!-- Larger, semi-transparent particles -->
+    <attribute name="Size Min" value="0.8" />
+    <attribute name="Size Max" value="1.5" />
+    <attribute name="Size Add" value="0.3" />
+    
+    <!-- Upward direction (smoke rises) -->
+    <attribute name="Direction Min" value="-0.2 0.8 -0.1" />
+    <attribute name="Direction Max" value="0.2 1.0 0.1" />
+    
+    <!-- Slower velocity for smoke drift effect -->
+    <attribute name="Velocity Min" value="2.0" />
+    <attribute name="Velocity Max" value="5.0" />
+    <attribute name="Velocity Damping" value="0.98" />
+    
+    <!-- Gentle rotation -->
+    <attribute name="Rotation Speed Min" value="-30" />
+    <attribute name="Rotation Speed Max" value="30" />
+    
+    <!-- Fade in/out for soft appearance -->
+    <attribute name="Fade In Time" value="0.2" />
+    <attribute name="Fade Out Time" value="0.5" />
+    
+    <!-- Normal alpha blending (not additive) for smoke -->
+    <attribute name="Additive" value="false" />
+    
+    <!-- Material: Uses dark gray/black smoke texture -->
+    <attribute name="Material" value="Materials/NitroSmoke.xml" />
+  </emitter>
+</particleeffect>

@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2023 the Urho3D project
+// Copyright (c) 2008-2023 the Urho 4.0 project
 // License: MIT
 
 plugins {

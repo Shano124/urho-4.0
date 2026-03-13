@@ -6,14 +6,14 @@
 
 ---
 
-# Urho3D
+# Urho 4.0
 
 ![](https://raw.githubusercontent.com/urho3d-learn/flappy-urho/main/screen.png)
 
 [![CI/CD](https://github.com/urho3d/Urho3D/workflows/CI/CD/badge.svg)](https://github.com/urho3d/Urho3D/actions?query=workflow%3ACI%2FCD)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/4954/badge.svg)](https://scan.coverity.com/projects/urho3d-urho3d)
 
-**Urho3D** is a free lightweight, cross-platform 2D and 3D game engine.
+**Urho 4.0** is a free lightweight, cross-platform 2D and 3D game engine.
 
 ## License
 
@@ -42,11 +42,11 @@ and many other developers, a list of which can be viewed [here](https://github.c
 
 # Информация для русскоязычной аудитории
 
-**Urho3D** - это легковесный, кроссплатформенный 2D и 3D игровой движок.
+**Urho 4.0** - это легковесный, кроссплатформенный 2D и 3D игровой движок.
 
 ## Лицензия
 
-Urho3D распространяется под лицензией MIT.
+Urho 4.0 распространяется под лицензией MIT.
 
 Тексты лицензий:
 * [Проект Urho3D](licenses/urho3d/LICENSE)

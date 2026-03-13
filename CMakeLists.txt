@@ -5,7 +5,7 @@
 cmake_minimum_required (VERSION 3.15)
 
 # Set project name
-project (Urho3D)
+project (Urho 4.0)
 
 # Show command line options
 get_cmake_property (CACHE_VARS CACHE_VARIABLES)

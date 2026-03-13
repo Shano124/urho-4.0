@@ -1,4 +1,5 @@
-// Copyright (c) 2008-2023 the Urho3D project
+// Copyright (c) 2008-2026 the Urho 4.0 project
+// Copyright (c) 2026 Nitro Boost System extension by Shano
 // License: MIT
 
 #pragma once
@@ -88,6 +89,78 @@ public:
     void FixedPostUpdate(float timeStep) override;
     /// Perform variable step post-update.
     void PostUpdate(float timeStep) override;
+
+    /// NITRO BOOST SYSTEM METHODS
+    /// ============================
+
+    /// Activate or deactivate nitro boost. Boost can only be activated when cooldown has expired.
+    /// @param active True to activate nitro, false to deactivate.
+    /// @return True if the state change was successful, false if nitro is on cooldown.
+    /// @doc Activating nitro applies a multiplier to engine force and triggers visual/audio effects.
+    bool SetNitroActive(bool active);
+
+    /// Check if nitro boost is currently active.
+    /// @return True if nitro is active and providing power boost.
+    bool IsNitroActive() const { return nitroActive_; }
+
+    /// Check if nitro boost can be activated (cooldown has expired and not already active).
+    /// @return True if boost is available for activation.
+    bool CanActivateNitro() const { return (nitroCooldownTimer_ <= 0.0f) && !nitroActive_; }
+
+    /// Set the duration of nitro boost effect in seconds.
+    /// @param duration Duration in seconds. Default is 3.0 seconds.
+    void SetNitroDuration(float duration) { nitroDuration_ = Max(0.1f, duration); }
+
+    /// Get the configured duration of nitro boost effect.
+    /// @return Duration in seconds.
+    float GetNitroDuration() const { return nitroDuration_; }
+
+    /// Set the cooldown period before nitro can be used again in seconds.
+    /// @param cooldown Cooldown in seconds. Default is 5.0 seconds.
+    void SetNitroCooldown(float cooldown) { nitroCooldown_ = Max(0.1f, cooldown); }
+
+    /// Get the configured cooldown period for nitro.
+    /// @return Cooldown in seconds.
+    float GetNitroCooldown() const { return nitroCooldown_; }
+
+    /// Set the engine force multiplier applied during nitro boost.
+    /// @param multiplier Multiplier value (e.g., 2.5 for 2.5x power). Must be >= 1.0.
+    /// @doc This multiplier is gradually applied based on the startup curve, not applied instantly.
+    void SetNitroMultiplier(float multiplier) { nitroMultiplier_ = Max(1.0f, multiplier); }
+
+    /// Get the configured engine force multiplier.
+    /// @return Multiplier value.
+    float GetNitroMultiplier() const { return nitroMultiplier_; }
+
+    /// Set the time for nitro to reach full power from activation.
+    /// @param time Time in seconds. Default is 0.3 seconds. Lower values mean snappier response.
+    /// @doc Prevents instant power spike; smooths acceleration curve for realism.
+    void SetNitroStartupTime(float time) { nitroStartupTime_ = Max(0.01f, time); }
+
+    /// Get the configured startup time for nitro power curve.
+    /// @return Startup time in seconds.
+    float GetNitroStartupTime() const { return nitroStartupTime_; }
+
+    /// Get the remaining time on current nitro boost in seconds.
+    /// @return Remaining boost time. 0.0 if boost is inactive.
+    float GetNitroTimer() const { return nitroActive_ ? nitroTimer_ : 0.0f; }
+
+    /// Get the remaining cooldown time before nitro can be activated again in seconds.
+    /// @return Remaining cooldown time. 0.0 if nitro is available.
+    float GetNitroCooldownTimer() const { return Max(0.0f, nitroCooldownTimer_); }
+
+    /// Get the current power curve factor (0.0 to 1.0) during nitro boost.
+    /// @return Power curve value. Starts at 0.0 and smoothly transitions to 1.0 based on startup time.
+    /// @doc Used for smooth power application and visual feedback. 0.0 = cold start, 1.0 = full power.
+    float GetNitroPowerCurve() const { return nitroPowerCurve_; }
+
+    /// Get the next available time when nitro can be re-activated (UTC seconds).
+    /// @return World time when nitro will be available again.
+    float GetNitroNextAvailableTime() const;
+
+    /// Reset nitro system to initial state (cooldown expired, boost inactive).
+    /// @doc Useful for respawning or resetting vehicle state.
+    void ResetNitroSystem();
 
     /// Get wheel position relative to RigidBody.
     Vector3 GetWheelPosition(int wheel);
@@ -193,6 +266,45 @@ private:
     float maxSideSlipSpeed_;
     /// Loaded data temporarily wait here for ApplyAttributes to come pick them up.
     VariantVector loadedWheelData_;
+
+    // NITRO BOOST SYSTEM MEMBERS
+    // ==========================
+
+    /// Flag indicating if nitro boost is currently active.
+    bool nitroActive_;
+    /// Remaining time for current nitro boost in seconds.
+    float nitroTimer_;
+    /// Remaining cooldown time before nitro can be re-activated in seconds.
+    /// When this reaches 0, nitro becomes available again.
+    float nitroCooldownTimer_;
+    /// Total duration of nitro boost effect in seconds (default: 3.0).
+    float nitroDuration_;
+    /// Cooldown period after boost expires before can activate again in seconds (default: 5.0).
+    float nitroCooldown_;
+    /// Engine force multiplier applied during boost (default: 2.5x).
+    /// Used to scale SetEngineForce() calls for all wheels proportionally.
+    float nitroMultiplier_;
+    /// Time for power to smoothly ramp from 0 to full multiplier in seconds (default: 0.3).
+    /// Creates gradual acceleration curve to avoid instant power spike.
+    float nitroStartupTime_;
+    /// Current power curve factor (0.0 to 1.0). Smoothly transitions during startup.
+    /// 0.0 = boost just activated, 1.0 = full boost power available.
+    /// Used in calculations: effective_multiplier = 1.0 + (nitroMultiplier_ - 1.0) * nitroPowerCurve_
+    float nitroPowerCurve_;
+    /// World start time when nitro was activated (for reference timestamp).
+    /// Updated when SetNitroActive(true) is called.
+    float nitroStartTime_;
+
+    /// Update nitro system state each frame. Called from FixedUpdate().
+    /// @param timeStep Time step in seconds.
+    /// @doc Manages timer countdowns, power curve interpolation, and state transitions.
+    void UpdateNitroState(float timeStep);
+
+    /// Get the effective engine force multiplier based on current nitro state.
+    /// @return Multiplier value (1.0 = no boost, up to nitroMultiplier_ at full power).
+    /// @doc Returns 1.0 if nitro inactive. Interpolates between 1.0 and nitroMultiplier_
+    ///      based on nitroPowerCurve_ if nitro is active.
+    float GetNitroEngineForceFactor() const;
 };
 
 }

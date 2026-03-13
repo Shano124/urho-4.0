@@ -1,8 +1,8 @@
-# Copyright (c) 2008-2023 the Urho3D project
+# Copyright (c) 2008-2023 the Urho 4.0 project
 # Copyright (c) 2022-2023 the Dviglo project
 # License: MIT
 
-# Check existence of various header files and their functions required by some of the third-party libraries and Urho3D library
+# Check existence of various header files and their functions required by some of the third-party libraries and Urho 4.0 library
 # Set the CMake variables in this scope but only add the compiler defines in the respective library's scope
 include (CheckIncludeFile)
 foreach (HEADER stdint.h inttypes.h malloc.h)
